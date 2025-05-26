@@ -3,13 +3,16 @@ from grid import Grid
 from line import LineAdapter
 from tile import *
 
-grid_height = grid_width = game_height = game_width = 801
+grid_height = grid_width = game_height = game_width = 851
 game_bg_color = (189, 173, 150)
-game = Game(title="2048", bg_color=game_bg_color, width_height=(game_width, game_height))
+game = Game(title="2048",
+            bg_color=game_bg_color,
+            width_height=(game_width, game_height)
+            )
 
 grid_color = (154, 137, 120)
 grid_line_width = 17
-grid_rows = grid_columns = 4
+grid_rows = grid_columns = 6
 grid_start_pos = ((game.width - grid_width) // 2, (game.height - grid_height) // 2)
 grid = Grid(
     line_adapter=LineAdapter(line_width=grid_line_width, color=grid_color),
@@ -21,14 +24,6 @@ grid = Grid(
     color=grid_color
 )
 
-grid.add_tile(0, 0, 2)
-grid.add_tile(0, 1, 2)
-grid.add_tile(0, 2, 2)
-grid.add_tile(0, 3, 2)
-
-
-
-
-
+grid.reset_grid()
 game.add_observer(grid)
 game.run()

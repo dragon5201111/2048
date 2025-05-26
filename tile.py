@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 import pygame
+import math
 
 
 class Tile:
-    def __init__(self, number, font, width_height, bg_color, text_color, start_pos=(0, 0)):
+    def __init__(self, number, font, width_height, bg_color_start, bg_color_end,  text_color, start_pos=(0, 0)):
         self.number = number
         self.font = font
         self.width, self.height = width_height
-        self.bg_color = bg_color
+        self.bg_color_start = bg_color_start
+        self.bg_color_end = bg_color_end
         self.text_color = text_color
 
         self.rect = pygame.Rect(start_pos, width_height)
@@ -19,8 +21,23 @@ class Tile:
         text_surface = self.font.render(str(self.number), True, self.text_color)
         text_rect = text_surface.get_rect(center=self.rect.center)
 
-        pygame.draw.rect(surface, self.bg_color, self.rect)
+        pygame.draw.rect(surface, self.get_color(), self.rect)
         surface.blit(text_surface, text_rect)
+
+    def get_color(self):
+        if self.number <= 2:
+            return self.bg_color_start
+
+        power = int(math.log2(self.number)) - 1
+
+        max_power = 11
+        t = min(power / max_power, 1.0)
+
+        r = int(self.bg_color_start[0] + t * (self.bg_color_end[0] - self.bg_color_start[0]))
+        g = int(self.bg_color_start[1] + t * (self.bg_color_end[1] - self.bg_color_start[1]))
+        b = int(self.bg_color_start[2] + t * (self.bg_color_end[2] - self.bg_color_start[2]))
+
+        return r, g, b
 
     def get_number(self):
         return self.number
@@ -43,6 +60,8 @@ class DefaultTileFactory(TileFactory):
         return Tile(
             number=number,
             font=pygame.font.SysFont(None, 48),
-            width_height=width_height, bg_color=(238, 229, 219),
+            width_height=width_height,
+            bg_color_start=(238, 229, 219),
+            bg_color_end=(255, 69, 0),
             text_color=(0, 0, 0)
         )
