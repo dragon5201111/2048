@@ -63,5 +63,5 @@ class DefaultTileFactory(TileFactory):
             width_height=width_height,
             bg_color_start=(238, 229, 219),
             bg_color_end=(255, 69, 0),
-            text_color=(0, 0, 0)
+            text_color=(116, 100, 83)
         )
