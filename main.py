@@ -12,7 +12,7 @@ game = Game(title="2048",
 
 grid_color = (154, 137, 120)
 grid_line_width = 13
-grid_rows = grid_columns = 2
+grid_rows = grid_columns = 4
 grid_start_pos = ((game.width - grid_width) // 2, (game.height - grid_height) // 2)
 grid = Grid(
     line_adapter=LineAdapter(
