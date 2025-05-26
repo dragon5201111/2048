@@ -3,10 +3,11 @@ import sys
 
 
 class Game:
-    def __init__(self, width_height, title="Untitled"):
+    def __init__(self, width_height, bg_color, title="Untitled"):
         pygame.init()
 
         self.width, self.height = width_height
+        self.bg_color = bg_color
         self.title = title
         self.screen = pygame.display.set_mode((self.width, self.height))
 
@@ -27,7 +28,7 @@ class Game:
         self.observers.append(observer)
 
     def draw(self):
-        self.screen.fill((255, 255, 255))
+        self.screen.fill(self.bg_color)
 
         for observer in self.observers:
             observer.draw(self.screen)

@@ -11,17 +11,25 @@ class Tile:
         self.text_color = text_color
 
         self.rect = pygame.Rect(start_pos, width_height)
-        self.text_surface = self.font.render(str(self.number), True, self.text_color)
-        self.text_rect = self.text_surface.get_rect(center=self.rect.center)
-
-    def set_position(self, position):
-        self.rect.topleft = position
-        self.text_rect = self.text_surface.get_rect(center=self.rect.center)
+        self.has_merged = False
 
     def draw(self, surface, position):
-        self.set_position(position)
+        self.rect.topleft = position
+
+        text_surface = self.font.render(str(self.number), True, self.text_color)
+        text_rect = text_surface.get_rect(center=self.rect.center)
+
         pygame.draw.rect(surface, self.bg_color, self.rect)
-        surface.blit(self.text_surface, self.text_rect)
+        surface.blit(text_surface, text_rect)
+
+    def get_number(self):
+        return self.number
+
+    def set_number(self, number):
+        self.number = number
+
+    def set_has_merged(self, has_merged):
+        self.has_merged = has_merged
 
 
 class TileFactory(ABC):
@@ -35,6 +43,6 @@ class DefaultTileFactory(TileFactory):
         return Tile(
             number=number,
             font=pygame.font.SysFont(None, 48),
-            width_height=width_height, bg_color=(25, 25, 25),
+            width_height=width_height, bg_color=(238, 229, 219),
             text_color=(0, 0, 0)
         )

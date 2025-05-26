@@ -1,6 +1,7 @@
 import pygame
 
 from drawableobserver import DrawableObserver
+from tile import Tile
 
 
 class Grid(DrawableObserver):
@@ -43,23 +44,25 @@ class Grid(DrawableObserver):
         return (self.height - (self.line_width * (self.rows + 1))) // self.rows
 
     def add_tile(self, row, column, number):
-        new_tile = self.tile_factory.create_tile(number=number, width_height=(self.get_cell_width(), self.get_cell_height()))
+        new_tile = self.tile_factory.create_tile(number=number,
+                                                 width_height=(self.get_cell_width(), self.get_cell_height()))
         self.tiles[row][column] = new_tile
 
-    def draw_tile(self, row, column, surface):
-        tile = self.tiles[row][column]
+    def move_tile(self, old_row, old_column, new_row, new_column):
+        tile = self.tiles[old_row][old_column]
+        self.tiles[old_row][old_column] = None
+        self.tiles[new_row][new_column] = tile
 
-        if tile:
-            tile.draw(surface, self.get_cell_position(row, column))
+    def get_tile(self, row, column):
+        return self.tiles[row][column]
+
+    def remove_tile(self, row, column):
+        self.tiles[row][column] = None
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, width=self.line_width)
         self.draw_lines(surface)
-        self.add_tile(0, 0, 2)
-        self.draw_tile(0, 0, surface)
-
-    def handle_event(self, surface, event):
-        print(f"Grid responding to {event}")
+        self.draw_tiles(surface)
 
     def draw_lines(self, surface):
         for i in range(1, self.columns):
@@ -69,3 +72,44 @@ class Grid(DrawableObserver):
         for i in range(1, self.rows):
             row_y = self.y + i * (self.line_width + self.get_cell_height())
             self.line_adapter.draw_horizontal(surface=surface, start_pos=(self.x, row_y), length=self.width)
+
+    def draw_tiles(self, surface):
+        for row in range(self.rows):
+            for column in range(self.columns):
+                tile = self.tiles[row][column]
+
+                if tile:
+                    self.draw_tile(row, column, surface)
+
+    def draw_tile(self, row, column, surface):
+        tile = self.tiles[row][column]
+
+        if tile:
+            tile.draw(surface, self.get_cell_position(row, column))
+
+    def handle_event(self, surface, event):
+        if event.type != pygame.KEYDOWN:
+            return
+
+        self.reset_has_merged()
+        self.shift_tiles(event)
+
+    def reset_has_merged(self):
+        for row in range(self.rows):
+            for column in range(self.columns):
+
+                tile = self.tiles[row][column]
+                if tile:
+                    tile.set_has_merged(False)
+
+    def shift_tiles(self, direction):
+        if direction == pygame.K_LEFT:
+            d_row, d_col = 0, -1
+        elif direction == pygame.K_RIGHT:
+            d_row, d_col = 0, 1
+        elif direction == pygame.K_UP:
+            d_row, d_col = -1, 0
+        elif direction == pygame.K_DOWN:
+            d_row, d_col = 1, 0
+        else:
+            return
