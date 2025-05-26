@@ -99,6 +99,9 @@ class Grid(DrawableObserver):
         if grid_changed:
             self.place_random_tile()
 
+        if self.is_grid_full() and not grid_changed:
+            self.reset_grid()
+
     def reset_has_merged(self):
         for row in range(self.rows):
             for column in range(self.columns):
