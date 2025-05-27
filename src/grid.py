@@ -150,16 +150,16 @@ class Grid(DrawableObserver):
 
         while True:
             next_row = current_row + d_row
-            next_col = current_column + d_column
+            next_column = current_column + d_column
 
-            if not self.is_valid_tile_position(next_row, next_col):
+            if not self.is_valid_tile_position(next_row, next_column):
                 break
 
-            next_tile = self.tiles[next_row][next_col]
+            next_tile = self.tiles[next_row][next_column]
             if next_tile is None:
                 # Moving
-                self.move_tile(current_row, current_column, next_row, next_col)
-                current_row, current_column = next_row, next_col
+                self.move_tile(current_row, current_column, next_row, next_column)
+                current_row, current_column = next_row, next_column
                 tile_changed = True
             else:
                 # Merging

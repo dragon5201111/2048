@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from utility import Util
 import pygame
 import math
 
@@ -15,6 +16,8 @@ class Tile:
         self.rect = pygame.Rect(start_pos, width_height)
         self.has_merged = False
 
+
+
     def draw(self, surface, position):
         self.rect.topleft = position
 
@@ -23,6 +26,7 @@ class Tile:
 
         pygame.draw.rect(surface, self.get_color(), self.rect)
         surface.blit(text_surface, text_rect)
+
 
     def get_color(self):
         if self.number <= 2:
@@ -33,10 +37,7 @@ class Tile:
         max_power = 11
         t = min(power / max_power, 1.0)
 
-        r = int(self.bg_color_start[0] + t * (self.bg_color_end[0] - self.bg_color_start[0]))
-        g = int(self.bg_color_start[1] + t * (self.bg_color_end[1] - self.bg_color_start[1]))
-        b = int(self.bg_color_start[2] + t * (self.bg_color_end[2] - self.bg_color_start[2]))
-
+        r, g, b, = Util.interpolate(t, self.bg_color_start, self.bg_color_end)
         return r, g, b
 
     def get_number(self):
