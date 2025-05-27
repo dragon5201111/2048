@@ -33,7 +33,6 @@ class Tile:
             return self.bg_color_start
 
         power = int(math.log2(self.number)) - 1
-
         max_power = 11
         t = min(power / max_power, 1.0)
 
