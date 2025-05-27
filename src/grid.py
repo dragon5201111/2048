@@ -47,7 +47,8 @@ class Grid(DrawableObserver):
 
     def add_tile(self, row, column, number):
         new_tile = self.tile_factory.create_tile(number=number,
-                                                 width_height=(self.get_cell_width(), self.get_cell_height()))
+                                                 width_height=(self.get_cell_width(), self.get_cell_height()),
+                                                 start_pos=self.get_cell_position(row, column))
         self.tiles[row][column] = new_tile
 
     def move_tile(self, old_row, old_column, new_row, new_column):
@@ -81,13 +82,15 @@ class Grid(DrawableObserver):
                 tile = self.tiles[row][column]
 
                 if tile:
+                    tile.set_target_position(self.get_cell_position(row, column))
+                    tile.update()
                     self.draw_tile(row, column, surface)
 
     def draw_tile(self, row, column, surface):
         tile = self.tiles[row][column]
 
         if tile:
-            tile.draw(surface, self.get_cell_position(row, column))
+            tile.draw(surface)
 
     def handle_event(self, surface, event):
         if event.type != pygame.KEYDOWN:
