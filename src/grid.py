@@ -166,6 +166,7 @@ class Grid(DrawableObserver):
                 tile_changed = True
             else:
                 # Merging
+                # TODO Add merge animation
                 if self.can_merge_tiles(current_tile, next_tile):
                     self.merge_tiles(current_row, current_column, next_tile)
                     tile_changed = True
