@@ -110,67 +110,76 @@ class Grid(DrawableObserver):
                 if tile:
                     tile.set_has_merged(False)
 
-    def shift_tiles(self, direction):
-        if direction == pygame.K_LEFT:
-            d_row, d_col = 0, -1
-            row_range = range(self.rows)
-            column_range = range(1, self.columns)
-
-        elif direction == pygame.K_RIGHT:
-            d_row, d_col = 0, 1
-            row_range = range(self.rows)
-            column_range = range(self.columns - 2, -1, -1)
-
-        elif direction == pygame.K_UP:
-            d_row, d_col = -1, 0
-            row_range = range(1, self.rows)
-            column_range = range(self.columns)
-
-        elif direction == pygame.K_DOWN:
-            d_row, d_col = 1, 0
-            row_range = range(self.rows - 2, -1, -1)
-            column_range = range(self.columns)
-
-        else:
+    def shift_tiles(self, event_key):
+        direction_data = self.get_direction_data(event_key)
+        if direction_data is None:
             return False
+
+        d_row, d_column, row_range, column_range = direction_data
 
         grid_changed = False
 
         for row in row_range:
-            for col in column_range:
-                current_tile = self.tiles[row][col] if self.is_valid_tile_position(row, col) else None
-                if current_tile is None:
-                    continue
-
-                current_row, current_col = row, col
-
-                while True:
-                    next_row = current_row + d_row
-                    next_col = current_col + d_col
-
-                    if not self.is_valid_tile_position(next_row, next_col):
-                        break
-
-                    next_tile = self.tiles[next_row][next_col]
-
-                    if next_tile is None:
-                        # Moving
-                        self.move_tile(current_row, current_col, next_row, next_col)
-                        current_row, current_col = next_row, next_col
+            for column in column_range:
+                if self.is_valid_tile(row, column):
+                    if self.process_tile_shift(row, column, d_row, d_column):
                         grid_changed = True
-                    else:
-                        # Merging
-                        if self.can_merge_tiles(current_tile, next_tile):
-                            next_tile.set_number(next_tile.get_number() * 2)
-                            next_tile.set_has_merged(True)
-                            self.remove_tile(current_row, current_col)
-                            grid_changed = True
-                        break
+
         return grid_changed
+
+    def get_direction_data(self, event_key):
+        if event_key == pygame.K_LEFT:
+            return 0, -1, range(self.rows), range(1, self.columns)
+
+        elif event_key == pygame.K_RIGHT:
+            return 0, 1, range(self.rows), range(self.columns - 2, -1, -1)
+
+        elif event_key == pygame.K_UP:
+            return -1, 0, range(1, self.rows), range(self.columns)
+
+        elif event_key == pygame.K_DOWN:
+            return 1, 0, range(self.rows - 2, -1, -1), range(self.columns)
+
+        else:
+            return None
+
+    def process_tile_shift(self, start_row, start_column, d_row, d_column):
+        current_tile = self.tiles[start_row][start_column]
+        current_row, current_column = start_row, start_column
+        tile_changed = False
+
+        while True:
+            next_row = current_row + d_row
+            next_col = current_column + d_column
+
+            if not self.is_valid_tile_position(next_row, next_col):
+                break
+
+            next_tile = self.tiles[next_row][next_col]
+            if next_tile is None:
+                # Moving
+                self.move_tile(current_row, current_column, next_row, next_col)
+                current_row, current_column = next_row, next_col
+                tile_changed = True
+            else:
+                # Merging
+                if self.can_merge_tiles(current_tile, next_tile):
+                    self.merge_tiles(current_row, current_column, next_tile)
+                    tile_changed = True
+                break
+        return tile_changed
+
+    def merge_tiles(self, current_row, current_column, next_tile):
+        next_tile.set_number(next_tile.get_number() * 2)
+        next_tile.set_has_merged(True)
+        self.remove_tile(current_row, current_column)
 
     def can_merge_tiles(self, tile_one, tile_two):
         return (tile_one.get_number() == tile_two.get_number() and
                 not tile_one.has_merged and not tile_two.has_merged)
+
+    def is_valid_tile(self, row, column):
+        return self.is_valid_tile_position(row, column) and self.tiles[row][column] is not None
 
     def is_valid_tile_position(self, row, col):
         return 0 <= row < self.rows and 0 <= col < self.columns
